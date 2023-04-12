@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            text-align: center;
+        }
+        table {      
+            border-collapse: collapse;      
+            width: 100%;      
+        }  
+
+        th, td {      
+            border: 1px solid black;      
+            text-align: left;      
+            padding: 8px;   
+            text-align: center;   
+        }  
+
+        th {      
+            background-color: #f2f2f2;      
+            color: #333;      
+        }  
+
+        td {      
+            background-color: #f2f2f2;      
+            color: #333; 
+            padding: 0; 
+            height: 40px;    
+        }  
+
+        th.active, td.active {      
+            background-color: #ededed;      
+        }  
+
+        caption {      
+            font-size: 18px;      
+            font-weight: bold;      
+            margin-top: 10px;      
+        }  
+
+        thead {      
+            background-color: #f2f2f2;      
+            border-bottom: 1px solid black;      
+        }  
+
+        tr:nth-child(even) {      
+            background-color: #f2f2f2;      
+        }  
+
+        tr:hover {      
+            background-color: #e2e2e2;      
+        }  
+
+        .table-hoverable tbody {      
+            overflow: hidden;      
+        }  
+
+        .table-hoverable tbody tr:hover {      
+            background-color: #f2f2f2;      
+        }  
+
+        .table-hoverable tbody tr.active {      
+            background-color: #ededed;      
+        }  
+
+        .table-hoverable tbody td, .table-hoverable tbody th {      
+            cursor: pointer;      
+        }  
+
+        .table-hoverable tbody td:hover, .table-hoverable tbody th:hover {      
+            background-color: #f5f5f5;      
+        }  
+        input{
+            border: 0;  
+            padding: 0;  
+            margin: 0;  
+            width: 100%; 
+            height: 40px; 
+            color: #333;
+            text-align: center;
+            outline: none;
+            font-size: 18px; 
+        }
+        .mySelect{
+            position: relative;
+            right: -100px;
+        }
+        h3{
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h3 class="title">基于每次下跌5%进行补仓的策略</h3>
+        <select class="mySelect">    
+            <option value="option1">基于每次下跌5%进行补仓的策略</option>      
+            <option value="option2">基于每次下跌10%进行补仓的策略</option>      
+            <option value="option3">基于每次下跌15%进行补仓的策略</option>      
+            <option value="option4">基于每次下跌20%进行补仓的策略</option>      
+            <option value="option5">叠加补仓,5%->10%->15%->20%</option>      
+        </select>
+    </div>
+    <table>  
+        <thead>  
+          <tr>  
+            <th>索引</th>  
+            <th>补仓</th>  
+            <th>当前股价</th>  
+            <th>补仓股票数量</th> 
+            <th>股票持有总数量</th>  
+            <th>补仓成本(￥)</th> 
+            <th>持仓总成本(￥)</th>  
+            <th>补仓后股价</th>  
+            <th>基于现在股价需要涨多少才会回本</th>  
+          </tr>  
+        </thead>  
+        <tbody>  
+          <tr>  
+            <td>1</td>  
+            <td>建仓</td>  
+            <td><input value="7" class="input_price"></td>  
+            <td><input value="100" class="input_number"></td>  
+            <td class="hold_number">100</td>  
+            <td> 0</td>  
+            <td class="total_price">700</td>  
+            <td class="average_price">7.00</td>  
+            <td>0%</td>  
+          </tr>    
+        </tbody>  
+      </table>  
+      
+      
+    <script>
+        // 获取建仓股价
+        var priceEl = document.querySelector('.input_price')
+        priceEl.addEventListener('input', event => {
+            totalPrice()
+            refreshData()
+        })  
+        // 获取建仓数量
+        var numberEl = document.querySelector('.input_number')
+        numberEl.addEventListener('input', event => {
+            totalPrice()
+            refreshData()
+        }) 
+
+        // 每次降低的比例
+        var selScale = 0.05
+        var selIndex = 0
+        var mySelectEl = document.querySelector(".mySelect");
+        mySelectEl.addEventListener("change", (event) => {  
+            // 股票总持仓
+            var titleEl = document.querySelector('.title')
+            selIndex =  event.currentTarget.selectedIndex
+            var optionValue = event.currentTarget.options[selIndex].textContent;  
+            titleEl.textContent = optionValue;
+            if (selIndex<4) {                
+                selScale = 0.05 * (event.currentTarget.selectedIndex + 1);
+            }
+
+            totalPrice()
+            refreshData() 
+        }); 
+
+        // 仓库总价
+        function totalPrice() {
+            var price = Number(numberEl.value) * Number(priceEl.value)
+            // 总价
+            var totalPriceEl = document.querySelector('.total_price')
+            totalPriceEl.textContent = price
+            // 均价
+            var averageEl = document.querySelector('.average_price')
+            averageEl.textContent = Number(priceEl.value).toFixed(2)
+            // 股票总持仓
+            var holdEl = document.querySelector('.hold_number')
+            holdEl.textContent = numberEl.value
+        }    
+
+        var rows = []
+        
+        function refreshData() {
+            var preNum = Number(numberEl.value)
+            var prePrice = Number(priceEl.value).toFixed(2)
+            var preTotalPrice = Number(numberEl.value) * Number(priceEl.value)
+           
+            var table = document.querySelector('table');
+            for (var i = 0; i < 5; i++) { 
+                row = rows[i]
+                if (!row) {
+                    row = {}
+                }
+ 
+                // 创建一个新的 tr 元素  
+                var tr = document.createElement('tr');
+                var key1 = "tr"+i
+                if (row[key1]) {
+                    tr = row[key1]
+                }
+
+                // 特殊补仓时，selScale需要根据特别情况进行修改
+                if (selIndex >= 4) {
+                    selScale = 0.05 * (i + 1)
+                }
+                var price = (prePrice - prePrice * selScale).toFixed(2);
+                for (var j = 0; j < 9; j++) {  
+                    // 为 tr 元素添加一个 td 元素  
+                    var td = document.createElement('td'); 
+
+                    var key2 = "td"+j
+                    if (row[key2]) {
+                        td = row[key2]
+                    }
+                    switch (j) {
+                        case 0: // 索引
+                            td.textContent = i + 2;  
+                            break;
+                        case 1: // 亏损比例
+                            var scale = (prePrice - price) / prePrice * 100
+                            td.textContent = prePrice + '亏损' + scale.toFixed(0) + "%";  
+                            break;
+                        case 2: // 股票价格
+                            td.textContent = price; 
+                            prePrice = price;
+                            break;
+                        case 3: // 当前股票数量
+                            td.textContent = preNum + " 股";
+                            break;
+                        case 4: // 股票总数量
+                            preNum = preNum * 2; 
+                            td.textContent = preNum + " 股";
+                            break;
+                        case 5: // 补仓成本
+                            td.textContent = (price * (preNum / 2)).toFixed();
+                            break;
+                        case 6: // 持仓总成本
+                            var total = price * (preNum / 2) + preTotalPrice;
+                            var price = price * (preNum / 2);
+                            td.textContent = Math.round(price) + "+" + preTotalPrice + "=" + total;
+                            preTotalPrice = total
+                            break;
+                        case 7: // 补仓后股价
+                            td.textContent = (preTotalPrice / preNum).toFixed(2)   
+                            break;
+                        default: // 需要涨回多少回来
+                            var price = (preTotalPrice / preNum).toFixed(2) 
+                            var aveavt = (price - prePrice) / prePrice * 100
+                            td.textContent = aveavt.toFixed(2) + "%";  
+                            break;
+                    } 
+                    if (!row[key2]) {
+                        tr.appendChild(td);
+                    }
+                    row[key2] = td
+                }
+                // 如果trs中没有的话再添加到table
+                if (!row[key1]) {                   
+                    // 将 tr 元素添加到表格中  
+                    table.appendChild(tr); 
+                }
+                row[key1] = tr 
+                rows.push(row)
+            }
+        }
+
+        refreshData()
+ 
+    </script>
+</body>
+</html>
