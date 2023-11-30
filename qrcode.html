@@ -2,6 +2,23 @@
 <html>
 <head>
   <title>生成二维码</title>
+  <!-- 嵌入式   -->
+    <style type="text/css">
+        .container{
+            text-align: center; /*让div内部文字居中*/
+            background-color: #fff;
+            border-radius: 20px;
+            width: 350px;
+            height: 350px;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+    </style>
 </head>
 <body>
     <div class="container">
@@ -68,8 +85,8 @@
         // 设置要生成二维码的样式
         qrcode = new QRCode(document.getElementById("qrcode"), {
             text: codeText,
-            width: 200,
-            height: 200,
+            width: 350,
+            height: 350,
             colorDark: "#000000",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H
