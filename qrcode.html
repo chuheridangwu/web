@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>生成二维码</title>
+</head>
+<body>
+    <div class="container">
+        <!-- <input type="text" placeholder="请输入您想转化成二维码的字符串" id="input" /> -->
+        <!-- <button onclick="creatQRcode()">一键生成</button> -->
+        <div id="qrcode"></div>
+    </div>
+  <script src="https://zxpsuper.github.io/Demo/qrcode/qrcode-dev.js"></script>
+  <script>
+
+    var myHeaders = new Headers();
+    myHeaders.append("Host", "bi.96225.com");
+    myHeaders.append("xweb_xhr", "1");
+    myHeaders.append("appId", "com.smk.test.test");
+    myHeaders.append("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 MicroMessenger/6.8.0(0x16080000) NetType/WIFI MiniProgramEnv/Mac MacWechat/WMPF MacWechat/3.8.5(0x13080510)XWEB/1100");
+    myHeaders.append("Accept", "*/*");
+    myHeaders.append("Sec-Fetch-Site", "cross-site");
+    myHeaders.append("Sec-Fetch-Mode", "cors");
+    myHeaders.append("Sec-Fetch-Dest", "empty");
+    myHeaders.append("Referer", "https://servicewechat.com/wx349bd461bbe62002/51/page-frame.html");
+    myHeaders.append("Accept-Language", "zh-CN,zh;q=0.9");
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Connection", "keep-alive");
+
+    var raw = JSON.stringify({
+    "id": 848309,
+    "token": "smk_mall_token:b7f442120afe4ea2958a462dd9ac4645"
+    });
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    };
+
+    console.log("请求开始 ----")
+    fetch("https://bi.96225.com/smk_mall/ext/hz/cardOrder/getQrCode", requestOptions)
+    .then(response => response.text())
+    .then(function(response) {
+            // 在这里处理成功返回的数据
+            var obj = JSON.parse(response);
+            // 如果失败，弹出提示，需要重新更换token
+            if (obj.code != 0) {
+                alert(response)
+                return
+            }
+            var codeText = obj.response;
+            console.log(codeText);
+            // 请求接口返回结果
+            console.log('请求接口返回结果', response);
+            // 调用生成二维码的方法，并将qrCodeData传递给它
+            creatQRcode(codeText);
+        })
+    .catch(error => console.log('error', error));
+
+    console.log("请求结束-----")
+
+    var qrcode = null;
+    function creatQRcode(codeText) {
+        document.getElementById("qrcode").innerHTML = "";
+        // 设置要生成二维码的链接
+        // qrcode = new QRCode(document.getElementById("qrcode"), "http://www.baidu.com");  
+        // 设置要生成二维码的样式
+        qrcode = new QRCode(document.getElementById("qrcode"), {
+            text: codeText,
+            width: 200,
+            height: 200,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+  </script>
+</body>
+</html>
