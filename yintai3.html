@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人主页</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+        }
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: #333;
+            color: white;
+        }
+        .content {
+            margin: 0 auto;
+            max-width: 600px;
+            padding: 20px;
+        }
+		.button {
+		  width: 70px;
+		  padding: 10px;
+		  margin: 5px;
+		  font-size: 16px;
+		}
+    </style>
+</head>
+<body>
+ 
+<div class="header">
+    <h2>城西银泰电梯二维码</h2>
+</div>
+ 
+<div class="content">
+    <h2>E座</h2>
+    <p>电梯默认到达13层</p>
+	
+	<button class="button" onclick="sendPostRequest(3163)">6层</button>
+	<button class="button" onclick="sendPostRequest(3164)">7层</button>
+	<button class="button" onclick="sendPostRequest(3165)">8层</button>
+	<button class="button" onclick="sendPostRequest(3166)">9层</button>
+	<button class="button" onclick="sendPostRequest(3167)">10层</button>
+	<button class="button" onclick="sendPostRequest(3168)">11层</button>
+	<button class="button" onclick="sendPostRequest(3169)">12层</button>
+	<button class="button" onclick="sendPostRequest(3170)">13层</button>
+	<button class="button" onclick="sendPostRequest(3171)">14层</button>
+</div>
+
+<div id="qrcode" style="width: 100px; height: 100px;  margin: auto;"></div>
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script> -->
+<script src="./qrcode.js"></script>
+<script>
+
+	sendPostRequest(3170);
+
+	function sendPostRequest(floorId) {
+		// 获取当前的时间戳
+		let currentTime = Math.floor(Date.now() / 1000);
+
+		// 定义请求的URL和数据
+		let url = "https://yun.bolink.club/wit/faceuserpermissiongrouptb/selectTkEr";
+		let data = {
+		mobile: "15381016852",
+		projectId: 849,
+		currentTime: currentTime,
+		userId: 398191,
+		expirationTime: 5,
+		allList: 0,
+		deviceId: 190,
+		floorId: floorId,
+		deviceType: 1,
+		};
+
+		    // 定义请求的头部
+			let headers = new Headers();
+			headers.append("Host", "yun.bolink.club");
+			headers.append("copyright", "4.4.162");
+			headers.append("content-type", "application/json");
+			headers.append("accept", "*/*");
+			headers.append("sec-fetch-dest", "empty");
+			headers.append(
+			"referer",
+			"https://servicewechat.com/wxfc2f68263c3dea9d/457/page-frame.html"
+			);
+			headers.append("accept-language", "zh-CN,zh;q=0.9");
+
+			// 创建一个请求对象
+			let request = new Request(url, {
+			method: "POST",
+			headers: headers,
+			body: JSON.stringify(data),
+			});
+
+			    // 发送请求并打印返回结果
+				fetch(request)
+				.then((response) => response.json())
+				.then(function(response) {
+						// 如果失败，弹出提示，需要重新更换token
+						if (response.code != 200) {
+							alert(response)
+							return
+						}
+						var codeText = response.data;
+						console.log(codeText);
+						// 请求接口返回结果
+						console.log('请求接口返回结果', response);
+						// 调用生成二维码的方法，并将qrCodeData传递给它
+						creatQRcode(codeText);
+					})
+				.catch(error => console.log('error', error));
+
+				console.log("请求结束-----")
+
+				var qrcode = null;
+
+	}
+
+	function creatQRcode(codeText) {
+		document.getElementById("qrcode").innerHTML = "";
+		// 设置要生成二维码的链接
+		// qrcode = new QRCode(document.getElementById("qrcode"), "http://www.baidu.com");  
+		// 设置要生成二维码的样式
+		qrcode = new QRCode(document.getElementById("qrcode"), {
+			text: codeText,
+			width: 350,
+			height: 350,
+			colorDark: "#000000",
+			colorLight: "#ffffff",
+			correctLevel: QRCode.CorrectLevel.H
+		});
+	}
+
+</script>
+
+</body>
+</html>
